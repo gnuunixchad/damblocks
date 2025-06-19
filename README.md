@@ -1,14 +1,22 @@
-# sbar
-Simple bar script for dwm and other window managers.
+# damblocks
+Simple bar script for river and other window managers.
 
-![screenshot](https://github.com/pystardust/sbar/blob/master/screenshot.png?raw=true)
+![screenshot](./dam-damblocks.png)
 
 
-Inspired by dwmblocks. Written in posix.
+Fork of [sbar](https://github.com/pystardust/sbar). Written in posix.
 
 ## Features
 * Modules update with variable timing.
 * Signalling to update modules when needed.
+
+# Usage
+```sh
+# Start in river with my build of dam that can be found on
+# https://codeberg.org/unixchad/dam
+# https://github.com/gnuunixchad/dam
+pgrep '$HOME/.local/bin/sbar dam' || riverctl spawn "$HOME/.local/bin/damblocks | dam"
+```
 
 # Setup
 
