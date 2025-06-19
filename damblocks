@@ -1,0 +1,261 @@
+#!/bin/env sh
+# Pure POSIX plain text bar generator with signal support
+# Works with any bar taking stdin as plain text
+# @author nate zhou
+# @since 2025
+# Fork of sbar(https://github.com/pystardust/sbar) with custom modules.
+# Some function depends on my personal scripts for updating/caching/signaling,
+#    on [codeberg](https://codeberg.org/unixchad/dotfiles)
+#    and [github](https://github.com/gnuunixchad/dotfiles)
+
+# INI
+printf "$$" > /tmp/sbar
+sec=0
+
+# MODULES
+update_time () {
+	time="󰥔 $(date '+%b-%d %a %H:%M')"
+}
+
+update_battery () {
+    BAT="BAT1"
+    POWER="/sys/class/power_supply"
+    status="$(cat $POWER/$BAT/status)"
+    level="$(cat $POWER/$BAT/capacity)"
+    case "$status" in
+        "Discharging")
+            case "$level" in
+                [0-5]) icon="󰂎";;
+                [6-9]) icon="󰁺";;
+                1[0-9]) icon="󰁻";;
+                2[0-9]) icon="󰁼";;
+                3[0-9]) icon="󰁽";;
+                4[0-9]) icon="󰁽";;
+                5[0-9]) icon="󰁾";;
+                6[0-9]) icon="󰁿";;
+                7[0-9]) icon="󰂀";;
+                8[0-9]) icon="󰂁";;
+                9[0-9]) icon="󰂂";;
+                100)    icon="󰁹";;
+            esac
+            ;;
+        "Not charging")
+            icon=""
+            ;;
+        "Charging")
+            icon=""
+            ;;
+    esac
+    battery="$icon$level%"
+}
+
+update_bluetooth() {
+    icon="󰂯"
+    level=$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')
+    [ -z "$level" ] && icon="󰂲" || level=$level%
+    bluetooth="$icon$level"
+}
+
+update_volume() {
+    status="$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null)"
+    volume="$(echo $status | sed 's/[^0-9]*//g; s/^0//' )"
+    muted="$(echo $status | grep 'MUTED')"
+    [ -z "$muted" ] && icon="" || icon=""
+    volume="$icon$volume%"
+}
+
+update_microphone() {
+    status="$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ 2>/dev/null)"
+    mic="$(echo $status | sed 's/[^0-9]*//g; s/^0//' )"
+    muted="$(echo $status | grep 'MUTED')"
+    [ -z "$muted" ] && icon="" || icon=""
+    microphone="$icon$mic%"
+}
+
+update_brightness() {
+    level="$(brightnessctl | awk '/%/{gsub("[()]", "", $4); print $4}')"
+    case $level in
+        [0-9]%) icon="󱩎" ;;
+        1[0-9]%) icon="󱩏" ;;
+        2[0-9]%) icon="󱩐" ;;
+        3[0-9]%) icon="󱩐" ;;
+        4[0-9]%) icon="󱩑" ;;
+        5[0-9]%) icon="󱩒" ;;
+        6[0-9]%) icon="󱩓" ;;
+        7[0-9]%) icon="󱩔" ;;
+        8[0-9]%) icon="󱩕" ;;
+        9[0-9]%) icon="󱩖" ;;
+        100%)     icon="󰛨"  ;;
+    esac
+    brightness="$icon$level"
+}
+
+update_ethernet() {
+    status="$(cat /sys/class/net/e*/operstate 2>/dev/null)"
+    icon="󰛳"
+    [ "$status" != "up" ] && icon="󰲛"
+    ethernet="$icon"
+}
+
+update_wifi() {
+    status="$(cat /sys/class/net/w*/operstate 2>/dev/null)"
+    level="$(awk '/^\s*w/ {print int($3 * 100 / 70)"%"}' /proc/net/wireless)"
+    [ "$status" = "up" ] && icon="󰖩" || icon="󰖪" level=""
+    wifi="$icon$level"
+}
+
+update_temperature() {
+    policy=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    mode=""
+    temperature="$(cat /sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input | sed 's/000$//')"
+    case "$temperature" in
+        [0-9]|[1-2][0-9]) icon="" ;;
+        [2-4][0-9]) icon="" ;;
+        [5-7][0-9]) icon="" ;;
+        [7-9][0-9]) icon="" ;;
+    esac
+    temperature="$icon$temperature℃"
+}
+
+update_cpu() {
+    usage="$(mpstat --dec=0 | awk 'NR==4 {print 100 - $NF}')"
+    icon=""
+    cpu="$icon$usage%"
+}
+
+update_memory() {
+    usage="$(command free | awk '/Mem:/ {printf "%.0f\n", $3/$2 * 100}')"
+    icon=""
+    memory="$icon$usage%"
+}
+
+update_home() {
+    usage="$(command df /home | awk 'NR==2 {print $5}' | tr -d '%')"
+    icon=""
+    home="$icon$usage%"
+}
+
+update_root() {
+    usage="$(command df / | awk 'NR==2 {print $5}' | tr -d '%')"
+    icon="🗁"
+    root="$icon$usage%"
+}
+
+#update_usb() {
+#    result="$(lsblk -o 'tran' | grep usb | wc -l)"
+#    icon=""
+#    usb="$icon$result"
+#}
+
+update_uptime() {
+    result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/,//g; s/ $//; s/ / /;')"
+    icon=""
+    [ -n "$result" ] && uptime="$icon $result" || uptime="$icon ≤1h"
+}
+
+update_ttylogin() {
+    tty_count="$(w -h | wc -l )"
+    icon=""
+    ttylogin="$icon$tty_count"
+}
+
+update_pacman() {
+    result="$(cat $HOME/.cache/checkupdates-cron.num)"
+    icon=""
+    pacman="$icon$result"
+}
+
+update_mutt() {
+    MAIL_DIR="$HOME/doc/mail"
+    count=0
+    icon="󰇮"
+    # Loop through each mailbox directory
+    for mailbox in "$MAIL_DIR"/*; do
+        if [ -d "$mailbox" ]; then
+            # Manually specify folders instead of using brace expansion
+            for folder in "$mailbox/INBOX" "$mailbox/Junk"; do
+                if [ -d "$folder/new" ]; then
+                    # Count the number of files in the 'new' directory
+                    count=$(($count + $(find "$folder/new" -type f | wc -l)))
+                fi
+            done
+        fi
+    done
+    mutt="$icon$count"
+}
+
+update_newsboat() {
+    result="$(cat $HOME/.cache/newsboat.num)"
+    icon="󰡠"
+    newsboat="$icon$result"
+}
+
+update_calcurse() {
+    result="$(cat $HOME/.cache/calcurse.num)"
+    icon=""
+    calcurse="$icon$result"
+}
+
+update_wttr() {
+    WTTR_CACHE="$HOME/.cache/wttr"
+    update_time="$(stat -c "%Y" "$WTTR_CACHE")"
+    current_time="$(date +%s)"
+    [ $((current_time - update_time)) -gt 86400 ] && result=""
+    result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
+    [ -z "$result" ] && icon="󰅟"
+    wttr="$result"
+}
+
+# modules that don't update on their own need to be run at the start for getting their initial value
+update_volume; update_microphone; update_brightness; update_pacman; update_newsboat; update_calcurse; update_wttr
+
+display () {
+    # ` `(U+2009) is the Thin Space
+    printf "%s" "[$wttr][$calcurse $newsboat $mutt][$pacman $ttylogin $uptime][$root $home][$memory $cpu $temperature][$wifi $ethernet][$brightness $microphone $volume][$battery $bluetooth][$time]"
+}
+
+# SIGNALLING
+# trap	"<function>;display"		"RTMIN+n"
+# to update it from external commands
+## kill -m "$(cat /tmp/sbar)"
+# where m = 34 + n
+trap	"update_bluetooth;display"	"RTMIN"     # -34 udev.rules
+trap	"update_battery;display"  	"RTMIN+1"
+trap	"update_volume;display"	  	"RTMIN+2"   # -36 .local/bin/audio
+trap	"update_microphone;display"	"RTMIN+3"   # -37 .local/bin/audio
+trap	"update_brightness;display"	"RTMIN+4"   # -38 .local/bin/bright
+#trap	"update_usb;display"	    "RTMIN+5"   # -39 udev.rules
+trap	"update_pacman;display"	    "RTMIN+6"   # -40 .local/bin/checkupdates-cron
+trap	"update_mutt;display"	    "RTMIN+7"   # -41
+trap	"update_newsboat;display"   "RTMIN+8"   # -42
+trap	"update_calcurse;display"   "RTMIN+9"   # -43
+trap	"update_wttr;display"       "RTMIN+10"   # -44
+
+while true
+do
+	sleep 1 & wait && {
+		# to update item ever n seconds with a offset of m
+		## [ $((sec % n)) -eq m ] && udpate_item
+		[ $((sec % 5 )) -eq 0 ] && update_time 	# update time every 5 seconds
+		[ $((sec % 10)) -eq 0 ] && update_battery
+		[ $((sec % 10)) -eq 0 ] && update_bluetooth
+		[ $((sec % 10)) -eq 0 ] && update_ethernet
+		[ $((sec % 10)) -eq 0 ] && update_wifi
+		[ $((sec % 5)) -eq 0 ] && update_temperature
+		[ $((sec % 5)) -eq 0 ] && update_cpu
+		[ $((sec % 5)) -eq 0 ] && update_memory
+		[ $((sec % 60)) -eq 0 ] && update_home
+		[ $((sec % 60)) -eq 0 ] && update_root
+		#[ $((sec % 60)) -eq 0 ] && update_usb
+		[ $((sec % 900)) -eq 0 ] && update_uptime
+		[ $((sec % 60)) -eq 0 ] && update_ttylogin
+		[ $((sec % 60)) -eq 0 ] && update_mutt
+
+		# how often the display updates ( 5 seconds )
+		[ $((sec % 5 )) -eq 0 ] && display
+
+        # cronjob
+		[ $((sec % 1800 )) -eq 0 ] && "$HOME/.local/bin/mbs" # mbsync
+		sec=$((sec + 1))
+	}
+done
