@@ -9,7 +9,8 @@
 #    and [github](https://github.com/gnuunixchad/dotfiles)
 
 # INI
-printf "$$" > /tmp/sbar
+[ -d "/tmp/${USER}" ] || mkdir -p "/tmp/${USER}"
+printf "$$" > "/tmp/${USER}/damblocks"
 sec=0
 
 # MODULES
@@ -217,7 +218,7 @@ display () {
 # SIGNALLING
 # trap	"<function>;display"		"RTMIN+n"
 # to update it from external commands
-## kill -m "$(cat /tmp/sbar)"
+## kill -m "$(cat /tmp/damblocks)"
 # where m = 34 + n
 trap	"update_bluetooth;display"	"RTMIN"     # -34 udev.rules
 trap	"update_battery;display"  	"RTMIN+1"
