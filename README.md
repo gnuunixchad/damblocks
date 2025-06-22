@@ -18,6 +18,12 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in posix.
 pgrep '$HOME/.local/bin/sbar dam' || riverctl spawn "$HOME/.local/bin/damblocks | dam"
 ```
 
+> [!NOTE]
+> Some functions depends on files generated my personal scripts from a cronjob,
+> which can be found inside the `.local/bin/` directory from
+> [codeberg](https://codeberg.org/unixchad/dotfiles) and
+> [github](https://github.com/gnuunixchad/dotfiles).
+
 # Setup
 
 * Add bar module as a function. Make sure to assign it to a variable.
