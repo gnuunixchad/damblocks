@@ -149,9 +149,9 @@ update_root() {
 #}
 
 update_uptime() {
-    result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/,//g; s/ $//; s/ / /;')"
+    uptime_result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/,//g; s/ $//; s/ / /;')"
     icon=""
-    [ -n "$result" ] && uptime="$icon $result" || uptime="$icon ≤1h"
+    [ -n "$uptime_result" ] && uptime="$icon $uptime_result" || uptime="$icon ≤1h"
 }
 
 update_ttylogin() {
@@ -161,14 +161,18 @@ update_ttylogin() {
 }
 
 update_pacman() {
-    result="$(cat $HOME/.cache/checkupdates-cron.num)"
+    pacman_result="$(cat $HOME/.cache/checkupdates-cron.num)"
     icon=""
-    pacman="$icon$result"
+    pacman="$icon$pacman_result"
 }
 
 update_mutt() {
     MAIL_DIR="$HOME/doc/mail"
-    count=0
+    MBSYNC_CACHE="${XDG_CACHE_HOME}/mbsync-cron"
+    UPDATE_MUTT_FREQUENCY=1800 # in seconds
+    update_mutt_time="$(stat -c "%Y" "$MBSYNC_CACHE")"
+    current_time="$(date +%s)"
+    mutt_count=0
     icon="󰇮"
     # Loop through each mailbox directory
     for mailbox in "$MAIL_DIR"/*; do
@@ -177,34 +181,42 @@ update_mutt() {
             for folder in "$mailbox/INBOX" "$mailbox/Junk"; do
                 if [ -d "$folder/new" ]; then
                     # Count the number of files in the 'new' directory
-                    count=$(($count + $(find "$folder/new" -type f | wc -l)))
+                    mutt_count=$(($mutt_count + $(find "$folder/new" -type f | wc -l)))
                 fi
             done
         fi
     done
-    mutt="$icon$count"
+    [ $((current_time - update_mutt_time)) -gt 86400 ] && icon="󱏣"
+    [ "$mutt_count" -gt 0 ] && icon="󰛏"
+    mutt="$icon$mutt_count"
 }
 
 update_newsboat() {
-    result="$(cat $HOME/.cache/newsboat.num)"
+    NEWS_CACHE="$HOME/.cache/newsboat.num"
+    update_newsboat_time=$(stat -c "%Y" "$NEWS_CACHE")
+    current_time=$(date +%s)
+    UPDATE_FREQUENCY=14400 # 4H
+    news_count="$(cat $NEWS_CACHE)"
     icon="󰡠"
-    newsboat="$icon$result"
+    [ $((current_time - update_newsboat_time)) -gt 86400 ] && \
+        icon="󰚣" news_count=0
+    newsboat="$icon$news_count"
 }
 
 update_calcurse() {
-    result="$(cat $HOME/.cache/calcurse.num)"
+    calen_count="$(cat $HOME/.cache/calcurse.num)"
     icon=""
-    calcurse="$icon$result"
+    calcurse="$icon$calen_count"
 }
 
 update_wttr() {
     WTTR_CACHE="$HOME/.cache/wttr"
-    update_time="$(stat -c "%Y" "$WTTR_CACHE")"
+    update_wttr_time="$(stat -c "%Y" "$WTTR_CACHE")"
     current_time="$(date +%s)"
-    [ $((current_time - update_time)) -gt 86400 ] && result=""
-    result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
-    [ -z "$result" ] && icon="󰅟"
-    wttr="$result"
+    [ $((current_time - update_wttr_time)) -gt 86400 ] && wttr_result=""
+    wttr_result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
+    [ -z "$wttt_result" ] && icon="󰅟"
+    wttr="$wttr_result"
 }
 
 # modules that don't update on their own need to be run at the start for getting their initial value
