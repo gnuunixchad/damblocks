@@ -1,4 +1,4 @@
-# damblocks
+# <img src="./misc/damblocks-repo.png" width="24"/> damblocks
 Simple bar script for river and other window managers.
 
 ![screenshot](./dam-damblocks.png)
