@@ -1,10 +1,10 @@
 # <img src="./misc/damblocks-repo.png" width="24"/> damblocks
-My *Simple bar* script for displaying status information in `river` and `dwl`.
+My *Simple bar* script for displaying status information in [river](https://codeberg.org/river/river) and [dwl](https://codeberg.org/dwl/dwl).
 
 ![screenshot](./dam-damblocks.png)
 
 
-Fork of [sbar](https://github.com/pystardust/sbar). Written in posix.
+Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
 
 ## Features
 * Modules update with variable timing.
@@ -25,9 +25,7 @@ alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
 
 > [!NOTE]
 > Some functions depends on files generated my personal scripts from a cronjob,
-> which can be found inside the `.local/bin/` directory from
-> [codeberg](https://codeberg.org/unixchad/dotfiles) and
-> [github](https://github.com/gnuunixchad/dotfiles).
+> which can be found inside the `.local/bin/` directory from my `dotfiles`([codeberg](https://codeberg.org/unixchad/dotfiles)/[github](https://github.com/gnuunixchad/dotfiles)).
 
 # Setup
 
