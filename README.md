@@ -1,5 +1,5 @@
 # <img src="./misc/damblocks-repo.png" width="24"/> damblocks
-Simple bar script for river and other window managers.
+My *Simple bar* script for displaying status information in `river` and `dwl`.
 
 ![screenshot](./dam-damblocks.png)
 
@@ -16,6 +16,11 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in posix.
 # https://codeberg.org/unixchad/dam
 # https://github.com/gnuunixchad/dam
 pgrep 'dam' || riverctl spawn "$HOME/.local/bin/damblocks | dam"
+
+# Start in my build of dwl with the bar patch
+# https://codeberg.org/unixchad/dwl
+# https://github.com/gnuunixchad/dwl
+alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
 ```
 
 > [!NOTE]
