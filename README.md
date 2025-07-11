@@ -15,7 +15,7 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in posix.
 # Start in river with my build of dam that can be found on
 # https://codeberg.org/unixchad/dam
 # https://github.com/gnuunixchad/dam
-pgrep '$HOME/.local/bin/sbar dam' || riverctl spawn "$HOME/.local/bin/damblocks | dam"
+pgrep 'dam' || riverctl spawn "$HOME/.local/bin/damblocks | dam"
 ```
 
 > [!NOTE]
