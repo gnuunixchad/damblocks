@@ -223,8 +223,11 @@ update_wttr() {
 update_volume; update_microphone; update_brightness; update_pacman; update_newsboat; update_calcurse; update_wttr
 
 display () {
-    # ` `(U+2009) is the Thin Space
-    printf "%s" "[$wttr][$calcurse $newsboat $mutt][$pacman $ttylogin $uptime][$root $home][$memory $cpu $temperature][$wifi $ethernet][$brightness $microphone $volume][$battery $bluetooth][$time]"
+    local space=" "         # ` `(U+2009) is the Thin Space
+    local delimiter_home="["
+    local delimiter_end="]"
+    local separator="]["
+    printf "%s" "${delimiter_home}${wttr}${separator}${calcurse}${space}${newsboat}${space}${mutt}${separator}${pacman}${space}${ttylogin}${space}${uptime}${separator}${root}${space}${home}${separator}${memory}${space}${cpu}${space}${temperature}${separator}${wifi}${space}${ethernet}${separator}${brightness}${space}${microphone}${space}${volume}${separator}${battery}${space}${bluetooth}${separator}${time}${delimiter_end}"
 }
 
 # SIGNALLING
