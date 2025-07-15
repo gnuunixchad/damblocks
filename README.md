@@ -11,17 +11,21 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
 * Signalling to update modules when needed.
 
 # Usage
+## Start in river with my build of dam
 ```sh
-# Start in river with my build of dam that can be found on
 # https://codeberg.org/unixchad/dam
 # https://github.com/gnuunixchad/dam
-pgrep 'dam' || riverctl spawn "$HOME/.local/bin/damblocks | dam"
+riverctl spawn "${HOME}/.local/bin/dam-run"
+```
+([dam-run](./dam-run))
 
-# Start in my build of dwl with the bar patch
+## Start in my build of dwl
+```sh
 # https://codeberg.org/unixchad/dwl
 # https://github.com/gnuunixchad/dwl
 alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
 ```
+
 
 > [!NOTE]
 > Some functions depends on files generated my personal scripts from a cronjob,

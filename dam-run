@@ -1,0 +1,20 @@
+#!/usr/bin/sh
+# @author nate zhou
+# @since 2025
+# dam-run: start status bar for river
+# @depends: dam damblocks
+
+bar_start() {
+    ${HOME}/.local/bin/damblocks | dam
+}
+
+bar_restart() {
+    killall dam
+    pkill -f damblocks
+    bar_start
+}
+
+
+if ! pgrep 'dam' > /dev/null || ! pgrep -f 'damblocks' > /dev/null; then
+    bar_restart
+fi
