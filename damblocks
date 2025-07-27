@@ -106,15 +106,10 @@ update_wifi() {
 }
 
 update_temperature() {
-    policy=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
-    mode=""
-    temperature="$(cat /sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input | sed 's/000$//')"
-    case "$temperature" in
-        [0-9]|[1-2][0-9]) icon="" ;;
-        [2-4][0-9]) icon="" ;;
-        [5-7][0-9]) icon="" ;;
-        [7-9][0-9]) icon="" ;;
-    esac
+    icon="󱃃"
+    THERMEL="/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input"
+    temperature="$(cat $THERMEL | sed 's/000$//')"
+    [ -z "$temperature" ] && icon="󱔱" temperature=""
     temperature="$icon$temperature℃"
 }
 
