@@ -132,13 +132,13 @@ update_memory() {
 
 update_home() {
     usage="$(command df /home | awk 'NR==2 {print $5}' | tr -d '%')"
-    icon=""
+    icon=""
     home="$icon$usage%"
 }
 
 update_root() {
     usage="$(command df / | awk 'NR==2 {print $5}' | tr -d '%')"
-    icon="🗁"
+    icon=""
     root="$icon$usage%"
 }
 
