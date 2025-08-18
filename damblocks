@@ -113,6 +113,20 @@ update_temperature() {
     temperature="$icon$temperature℃"
 }
 
+update_fanmode() {
+    icon=""
+    local mode="?"
+    policy_asus=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    if [ -f "$policy_asus" ]; then
+        case "$(cat $policy_asus)" in
+            0) mode="M" ;; # balanced
+            1) mode="H" ;; # performance
+            2) mode="L" ;; # silent
+        esac
+    fi
+    fanmode="$icon$mode"
+}
+
 update_cpu() {
     usage="$(mpstat --dec=0 | awk 'NR==4 {print 100 - $NF}')"
     icon=""
@@ -222,7 +236,7 @@ display () {
     local delimiter_home="["
     local delimiter_end="]"
     local separator="]["
-    printf "%s" "${delimiter_home}${wttr}${separator}${calcurse}${space}${newsboat}${space}${mutt}${separator}${pacman}${space}${ttylogin}${space}${uptime}${separator}${root}${space}${home}${separator}${memory}${space}${cpu}${space}${temperature}${separator}${wifi}${space}${ethernet}${separator}${brightness}${space}${microphone}${space}${volume}${separator}${battery}${space}${bluetooth}${separator}${time}${delimiter_end}"
+    printf "%s" "${delimiter_home}${wttr}${separator}${calcurse}${space}${newsboat}${space}${mutt}${separator}${pacman}${space}${ttylogin}${space}${uptime}${separator}${root}${space}${home}${separator}${memory}${space}${cpu}${space}${temperature}${space}${fanmode}${separator}${wifi}${space}${ethernet}${separator}${brightness}${space}${microphone}${space}${volume}${separator}${battery}${space}${bluetooth}${separator}${time}${delimiter_end}"
 }
 
 # SIGNALLING
@@ -253,6 +267,7 @@ do
 		[ $((sec % 10)) -eq 0 ] && update_ethernet
 		[ $((sec % 10)) -eq 0 ] && update_wifi
 		[ $((sec % 5)) -eq 0 ] && update_temperature
+		[ $((sec % 5)) -eq 0 ] && update_fanmode
 		[ $((sec % 5)) -eq 0 ] && update_cpu
 		[ $((sec % 5)) -eq 0 ] && update_memory
 		[ $((sec % 60)) -eq 0 ] && update_home
