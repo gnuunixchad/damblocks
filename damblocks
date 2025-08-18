@@ -114,14 +114,14 @@ update_temperature() {
 }
 
 update_fanmode() {
-    icon=""
+    icon="󰈐"
     local mode="?"
     policy_asus=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
     if [ -f "$policy_asus" ]; then
         case "$(cat $policy_asus)" in
-            0) mode="M" ;; # balanced
-            1) mode="H" ;; # performance
-            2) mode="L" ;; # silent
+            0) icon="󱜝" mode="M" ;; # balanced
+            1) icon="󱑯" mode="H" ;; # performance
+            2) icon="󱑰" mode="L" ;; # silent
         esac
     fi
     fanmode="$icon$mode"
