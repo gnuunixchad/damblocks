@@ -117,11 +117,17 @@ update_fanmode() {
     icon="󰈐"
     local mode="?"
     policy_asus=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    policy_ibm=/proc/acpi/ibm/fan
     if [ -f "$policy_asus" ]; then
         case "$(cat $policy_asus)" in
             0) icon="󱜝" mode="M" ;; # balanced
             1) icon="󱑯" mode="H" ;; # performance
             2) icon="󱑰" mode="L" ;; # silent
+        esac
+    elif [ -f "$policy_ibm" ]; then
+        mode="$(grep 'speed:' "$policy_ibm" | awk '{print $2}')"
+        case "$(grep 'level:' "$policy_ibm" | awk '{print $2}')" in
+            auto) icon="󱜝" ;;
         esac
     fi
     fanmode="$icon$mode"
