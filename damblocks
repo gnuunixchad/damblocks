@@ -19,7 +19,7 @@ update_time () {
 }
 
 update_battery () {
-    BAT="BAT1"
+    BAT="BAT?"
     POWER="/sys/class/power_supply"
     status="$(cat $POWER/$BAT/status)"
     level="$(cat $POWER/$BAT/capacity)"
@@ -107,7 +107,7 @@ update_wifi() {
 
 update_temperature() {
     icon="󱃃"
-    THERMEL="/sys/devices/platform/coretemp.0/hwmon/hwmon*/temp1_input"
+    THERMEL="/sys/class/thermal/thermal_zone0/temp"
     temperature="$(cat $THERMEL | sed 's/000$//')"
     [ -z "$temperature" ] && icon="󱔱" temperature=""
     temperature="$icon$temperature℃"
