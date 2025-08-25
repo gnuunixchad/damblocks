@@ -9,8 +9,7 @@
 #    and [github](https://github.com/gnuunixchad/dotfiles)
 
 # INI
-[ -d "/tmp/${USER}" ] || mkdir -p "/tmp/${USER}"
-printf "$$" > "/tmp/${USER}/damblocks"
+printf "$$" > "${XDG_RUNTIME_DIR}/damblocks.pid"
 sec=0
 
 # MODULES
@@ -19,10 +18,11 @@ update_time () {
 }
 
 update_battery () {
-    BAT="BAT?"
-    POWER="/sys/class/power_supply"
-    status="$(cat $POWER/$BAT/status)"
-    level="$(cat $POWER/$BAT/capacity)"
+    local icon=""
+    local BAT="BAT?"
+    local POWER="/sys/class/power_supply"
+    local status="$(cat $POWER/$BAT/status)"
+    local level="$(cat $POWER/$BAT/capacity)"
     case "$status" in
         "Discharging")
             case "$level" in
@@ -47,34 +47,33 @@ update_battery () {
             icon=""
             ;;
     esac
-    battery="$icon$level%"
+    battery="${icon}${level}%"
 }
 
 update_bluetooth() {
-    icon="󰂯"
-    level=$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')
+    local icon="󰂯"
+    local level=$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')
     [ -z "$level" ] && icon="󰂲" || level=$level%
-    bluetooth="$icon$level"
+    bluetooth="${icon}${level}"
 }
 
 update_volume() {
-    status="$(wpctl get-volume @DEFAULT_AUDIO_SINK@ 2>/dev/null)"
-    volume="$(echo $status | sed 's/[^0-9]*//g; s/^0//' )"
-    muted="$(echo $status | grep 'MUTED')"
+    local level=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SINK@.level")
+    local muted=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SINK@.muted")
     [ -z "$muted" ] && icon="" || icon=""
-    volume="$icon$volume%"
+    volume="${icon}${level}%"
 }
 
 update_microphone() {
-    status="$(wpctl get-volume @DEFAULT_AUDIO_SOURCE@ 2>/dev/null)"
-    mic="$(echo $status | sed 's/[^0-9]*//g; s/^0//' )"
-    muted="$(echo $status | grep 'MUTED')"
-    [ -z "$muted" ] && icon="" || icon=""
-    microphone="$icon$mic%"
+    local level=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SOURCE@.level")
+    local muted=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SOURCE@.muted")
+    [ -z "$muted" ] && icon="" || icon=""
+    microphone="${icon}${level}%"
 }
 
 update_brightness() {
-    level="$(brightnessctl | awk '/%/{gsub("[()]", "", $4); print $4}')"
+    local icon=""
+    local level="$(cat ${XDG_RUNTIME_DIR}/brightness.level)"
     case $level in
         [0-9]%) icon="󱩎" ;;
         1[0-9]%) icon="󱩏" ;;
@@ -88,36 +87,36 @@ update_brightness() {
         9[0-9]%) icon="󱩖" ;;
         100%)     icon="󰛨"  ;;
     esac
-    brightness="$icon$level"
+    brightness="${icon}${level}%"
 }
 
 update_ethernet() {
-    status="$(cat /sys/class/net/e*/operstate 2>/dev/null)"
-    icon="󰛳"
+    local status="$(cat /sys/class/net/e*/operstate 2>/dev/null)"
+    local icon="󰛳"
     [ "$status" != "up" ] && icon="󰲛"
     ethernet="$icon"
 }
 
 update_wifi() {
-    status="$(cat /sys/class/net/w*/operstate 2>/dev/null)"
-    level="$(awk '/^\s*w/ {print int($3 * 100 / 70)"%"}' /proc/net/wireless)"
+    local status="$(cat /sys/class/net/w*/operstate 2>/dev/null)"
+    local level="$(awk '/^\s*w/ {print int($3 * 100 / 70)"%"}' /proc/net/wireless)"
     [ "$status" = "up" ] && icon="󰖩" || icon="󰖪" level=""
-    wifi="$icon$level"
+    wifi="${icon}${level}"
 }
 
 update_temperature() {
-    icon="󱃃"
-    THERMEL="/sys/class/thermal/thermal_zone0/temp"
-    temperature="$(cat $THERMEL | sed 's/000$//')"
-    [ -z "$temperature" ] && icon="󱔱" temperature=""
-    temperature="$icon$temperature℃"
+    local icon="󱃃"
+    local THERMEL="/sys/class/thermal/thermal_zone0/temp"
+    local value="$(cat $THERMEL | sed 's/000$//')"
+    [ -z "$value" ] && icon="󱔱" temperature=""
+    temperature="${icon}${value}℃"
 }
 
 update_fanmode() {
-    icon="󰈐"
+    local icon="󰈐"
     local mode="?"
-    policy_asus=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
-    policy_ibm=/proc/acpi/ibm/fan
+    local policy_asus=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    local policy_ibm=/proc/acpi/ibm/fan
     if [ -f "$policy_asus" ]; then
         case "$(cat $policy_asus)" in
             0) icon="󱜝" mode="M" ;; # balanced
@@ -130,31 +129,31 @@ update_fanmode() {
             auto) icon="󱜝" ;;
         esac
     fi
-    fanmode="$icon$mode"
+    fanmode="${icon}${mode}"
 }
 
 update_cpu() {
-    usage="$(mpstat --dec=0 | awk 'NR==4 {print 100 - $NF}')"
-    icon=""
-    cpu="$icon$usage%"
+    local usage="$(mpstat --dec=0 | awk 'NR==4 {print 100 - $NF}')"
+    local icon=""
+    cpu="${icon}${usage}%"
 }
 
 update_memory() {
-    usage="$(command free | awk '/Mem:/ {printf "%.0f\n", $3/$2 * 100}')"
-    icon=""
-    memory="$icon$usage%"
+    local usage="$(command free | awk '/Mem:/ {printf "%.0f\n", $3/$2 * 100}')"
+    local icon=""
+    memory="${icon}${usage}%"
 }
 
 update_home() {
-    usage="$(command df /home | awk 'NR==2 {print $5}' | tr -d '%')"
-    icon=""
-    home="$icon$usage%"
+    local usage="$(command df /home | awk 'NR==2 {print $5}' | tr -d '%')"
+    local icon=""
+    home="${icon}${usage}%"
 }
 
 update_root() {
-    usage="$(command df / | awk 'NR==2 {print $5}' | tr -d '%')"
-    icon=""
-    root="$icon$usage%"
+    local usage="$(command df / | awk 'NR==2 {print $5}' | tr -d '%')"
+    local icon=""
+    root="${icon}${usage}%"
 }
 
 #update_usb() {
@@ -164,31 +163,31 @@ update_root() {
 #}
 
 update_uptime() {
-    uptime_result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/,//g; s/ $//; s/ / /;')"
-    icon=""
-    [ -n "$uptime_result" ] && uptime="$icon $uptime_result" || uptime="$icon ≤1h"
+    local result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/,//g; s/ $//; s/ / /;')"
+    local icon=""
+    [ -n "$result" ] && uptime="${icon}${result}" || uptime="$icon ≤1h"
 }
 
 update_ttylogin() {
-    tty_count="$(w -h | wc -l )"
-    icon=""
-    ttylogin="$icon$tty_count"
+    local count="$(w -h | wc -l )"
+    local icon=""
+    ttylogin="${icon}${count}"
 }
 
 update_pacman() {
-    pacman_result="$(cat $HOME/.cache/checkupdates-cron.num)"
-    icon=""
-    pacman="$icon$pacman_result"
+    local result="$(cat $HOME/.cache/checkupdates-cron.num)"
+    local icon=""
+    pacman="${icon}${result}"
 }
 
 update_mutt() {
-    MAIL_DIR="$HOME/doc/mail"
-    MBSYNC_CACHE="${XDG_CACHE_HOME}/mbsync-cron"
-    UPDATE_MUTT_FREQUENCY=1800 # in seconds
-    update_mutt_time="$(stat -c "%Y" "$MBSYNC_CACHE")"
-    current_time="$(date +%s)"
-    mutt_count=0
-    icon="󰇮"
+    local MAIL_DIR="$HOME/doc/mail"
+    local MBSYNC_CACHE="${XDG_CACHE_HOME}/mbsync-cron"
+    local UPDATE_MUTT_FREQUENCY=1800 # in seconds
+    local update_mutt_time="$(stat -c "%Y" "$MBSYNC_CACHE")"
+    local current_time="$(date +%s)"
+    local mutt_count=0
+    local icon="󰇮"
     # Loop through each mailbox directory
     for mailbox in "$MAIL_DIR"/*; do
         if [ -d "$mailbox" ]; then
@@ -203,31 +202,33 @@ update_mutt() {
     done
     [ $((current_time - update_mutt_time)) -gt 86400 ] && icon="󱏣"
     [ "$mutt_count" -gt 0 ] && icon="󰛏"
-    mutt="$icon$mutt_count"
+    mutt="${icon}${mutt_count}"
 }
 
 update_newsboat() {
-    NEWS_CACHE="$HOME/.cache/newsboat.num"
-    update_newsboat_time=$(stat -c "%Y" "$NEWS_CACHE")
-    current_time=$(date +%s)
-    UPDATE_FREQUENCY=14400 # 4H
-    news_count="$(cat $NEWS_CACHE)"
-    icon="󰡠"
+    local NEWS_CACHE="$HOME/.cache/newsboat.num"
+    local update_newsboat_time=$(stat -c "%Y" "$NEWS_CACHE")
+    local current_time=$(date +%s)
+    local UPDATE_FREQUENCY=14400 # 4H
+    local news_count="$(cat $NEWS_CACHE)"
+    local icon="󰡠"
     [ $((current_time - update_newsboat_time)) -gt 86400 ] && \
         icon="󰚣" news_count=0
-    newsboat="$icon$news_count"
+    newsboat="${icon}${news_count}"
 }
 
 update_calcurse() {
-    calen_count="$(cat $HOME/.cache/calcurse.num)"
-    icon=""
-    calcurse="$icon$calen_count"
+    local calen_count="$(cat $HOME/.cache/calcurse.num)"
+    local icon=""
+    calcurse="${icon}${calen_count}"
 }
 
 update_wttr() {
-    WTTR_CACHE="$HOME/.cache/wttr"
-    update_wttr_time="$(stat -c "%Y" "$WTTR_CACHE")"
-    current_time="$(date +%s)"
+    local WTTR_CACHE="$HOME/.cache/wttr"
+    local update_wttr_time="$(stat -c "%Y" "$WTTR_CACHE")"
+    local current_time="$(date +%s)"
+    local icon=""
+    local wttr_result=""
     [ $((current_time - update_wttr_time)) -gt 86400 ] && wttr_result=""
     wttr_result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
     [ -z "$wttt_result" ] && icon="󰅟"
