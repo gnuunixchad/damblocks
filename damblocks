@@ -57,23 +57,24 @@ update_bluetooth() {
     bluetooth="${icon}${level}"
 }
 
+# For audio & brightness modules, save to XDG_CACHE_HOME for reboot consistency
 update_volume() {
-    local level=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SINK@.level")
-    local muted=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SINK@.muted")
+    local level=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SINK@.level")
+    local muted=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SINK@.muted")
     [ -z "$muted" ] && icon="" || icon=""
     volume="${icon}${level}%"
 }
 
 update_microphone() {
-    local level=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SOURCE@.level")
-    local muted=$(cat "${XDG_RUNTIME_DIR}/audio-@DEFAULT_AUDIO_SOURCE@.muted")
+    local level=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SOURCE@.level")
+    local muted=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SOURCE@.muted")
     [ -z "$muted" ] && icon="" || icon=""
     microphone="${icon}${level}%"
 }
 
 update_brightness() {
     local icon=""
-    local level="$(cat ${XDG_RUNTIME_DIR}/brightness.level)"
+    local level="$(cat ${XDG_CACHE_HOME}/brightness.level)"
     case $level in
         [0-9]%) icon="󱩎" ;;
         1[0-9]%) icon="󱩏" ;;
