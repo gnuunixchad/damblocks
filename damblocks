@@ -183,7 +183,7 @@ update_pacman() {
 
 update_mutt() {
     local MAIL_DIR="$HOME/doc/mail"
-    local MBSYNC_CACHE="${XDG_CACHE_HOME}/mbsync-cron"
+    local MBSYNC_CACHE="${XDG_RUNTIME_DIR}/mbsync-cron"
     local UPDATE_MUTT_FREQUENCY=1800 # in seconds
     local update_mutt_time="$(stat -c "%Y" "$MBSYNC_CACHE")"
     local current_time="$(date +%s)"
