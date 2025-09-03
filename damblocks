@@ -242,7 +242,8 @@ update_newsboat() {
 }
 
 update_calcurse() {
-    local calen_count="$(cat $HOME/.cache/calcurse.num)"
+    local DAY="28"
+    local calen_count="$(calcurse -d "$DAY" | grep '^[0-9]' | wc -l)"
     local icon=""
     calcurse="${icon}${calen_count}"
 }
