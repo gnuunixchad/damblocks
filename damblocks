@@ -150,7 +150,9 @@ update_fanmode() {
             2) icon="󱑰" ;; # silent
         esac
     elif [ -f "$POLICY_IBM" ]; then
-        [ "$(grep 'level:' "$POLICY_IBM" | awk '{print $2}')" -eq 0 ] && icon="󱜝"
+        case "$(grep 'level:' "$POLICY_IBM" | awk '{print $2}')" in
+            0|auto) icon="󱜝" ;;
+        esac
         rpm="$(grep 'speed:' "$POLICY_IBM" | awk '{print $2}')"
     fi
     fanmode="${icon}${rpm}"
