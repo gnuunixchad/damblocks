@@ -126,10 +126,14 @@ update_wifi() {
 }
 
 update_temperature() {
-    local icon="󱃃"
+    local icon=""
     local THERMEL="/sys/class/thermal/thermal_zone0/temp"
-    local value="$(cat $THERMEL | sed 's/000$//')"
+    local value="$(sed 's/000$//' "$THERMEL")"
     [ -z "$value" ] && icon="󱔱" temperature=""
+    [ "$value" -lt 40 ] && icon=""
+    [ "$value" -lt 60 ] && icon=""
+    [ "$value" -lt 80 ] && icon=""
+    [ "$value" -ge 80 ] && icon=""
     temperature="${icon}${value}℃"
 }
 
