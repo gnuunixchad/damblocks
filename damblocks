@@ -14,7 +14,22 @@ sec=0
 
 # MODULES
 update_time () {
-	time="󰥔 $(date '+%b-%d %a %H:%M')"
+    local icon=""
+    case "$(date +'%I')" in
+        01) icon="󱐿" ;;
+        02) icon="󱑀" ;;
+        03) icon="󱑁" ;;
+        04) icon="󱑂" ;;
+        05) icon="󱑃" ;;
+        06) icon="󱑄" ;;
+        07) icon="󱑅" ;;
+        08) icon="󱑆" ;;
+        09) icon="󱑇" ;;
+        10) icon="󱑈" ;;
+        11) icon="󱑉" ;;
+        12) icon="󱑊" ;;
+    esac
+	time="$icon $(date '+%b-%d %a %H:%M')"
 }
 
 update_battery () {
