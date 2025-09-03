@@ -115,22 +115,20 @@ update_temperature() {
 
 update_fanmode() {
     local icon="󰈐"
-    local mode="?"
-    local policy_asus=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
-    local policy_ibm=/proc/acpi/ibm/fan
-    if [ -f "$policy_asus" ]; then
-        case "$(cat $policy_asus)" in
-            0) icon="󱜝" mode="M" ;; # balanced
-            1) icon="󱑯" mode="H" ;; # performance
-            2) icon="󱑰" mode="L" ;; # silent
+    local rpm="?"
+    local POLICY_ASUS=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
+    local POLICY_IBM=/proc/acpi/ibm/fan
+    if [ -f "$POLICY_ASUS" ]; then
+        case "$(cat $POLICY_ASUS)" in
+            0) icon="󱜝" rpm="M" ;; # balanced
+            1) icon="󱑯" rpm="H" ;; # performance
+            2) icon="󱑰" rpm="L" ;; # silent
         esac
-    elif [ -f "$policy_ibm" ]; then
-        mode="$(grep 'speed:' "$policy_ibm" | awk '{print $2}')"
-        case "$(grep 'level:' "$policy_ibm" | awk '{print $2}')" in
-            auto) icon="󱜝" ;;
-        esac
+    elif [ -f "$POLICY_IBM" ]; then
+        [ "$(grep 'level:' "$POLICY_IBM" | awk '{print $2}')" -eq 0 ] && icon="󱜝"
+        rpm="$(grep 'speed:' "$POLICY_IBM" | awk '{print $2}')"
     fi
-    fanmode="${icon}${mode}"
+    fanmode="${icon}${rpm}"
 }
 
 update_cpu() {
