@@ -200,7 +200,7 @@ update_ttylogin() {
 
 update_pacman() {
     local result="$(cat $HOME/.cache/checkupdates-cron.num)"
-    local icon=""
+    local icon=""
     pacman="${icon}${result}"
 }
 
