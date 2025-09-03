@@ -187,7 +187,7 @@ update_root() {
 #}
 
 update_uptime() {
-    local result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/,//g; s/ $//; s/ / /;')"
+    local result="$(uptime -p | sed 's/up //; s/ week\(s\)\?/w/; s/ day\(s\)\?/d/; s/ hour\(s\)\?/h/; s/[0-9]* minute.*//; s/ $//; s/ / /;' | cut -d',' -f-2 | sed 's/[^0-9a-z]//g')"
     local icon=""
     [ -n "$result" ] && uptime="${icon}${result}" || uptime="$icon ≤1h"
 }
