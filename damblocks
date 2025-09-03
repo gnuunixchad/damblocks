@@ -246,8 +246,8 @@ update_wttr() {
     local wttr_result=""
     [ $((current_time - update_wttr_time)) -gt 86400 ] && wttr_result=""
     wttr_result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
-    [ -z "$wttt_result" ] && icon="󰅟"
-    wttr="$wttr_result"
+    [ ! -f "$WTTR_CACHE" ] || [ -z "$wttr_result" ] && icon="󰨹"
+    wttr="${icon}${wttr_result}"
 }
 
 # modules that don't update on their own need to be run at the start for getting their initial value
