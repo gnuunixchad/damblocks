@@ -88,7 +88,7 @@ update_volume() {
 update_microphone() {
     local level=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SOURCE@.level")
     local muted=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SOURCE@.muted")
-    [ -z "$muted" ] && icon="" || icon=""
+    [ -z "$muted" ] && icon="" || icon=""
     microphone="${icon}${level}%"
 }
 
