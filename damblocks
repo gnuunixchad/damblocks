@@ -119,10 +119,11 @@ update_fanmode() {
     local POLICY_ASUS=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
     local POLICY_IBM=/proc/acpi/ibm/fan
     if [ -f "$POLICY_ASUS" ]; then
+        rpm="$(cat /sys/module/asus_wmi/drivers/platform:asus-nb-wmi/asus-nb-wmi/hwmon/hwmon?/fan1_input)"
         case "$(cat $POLICY_ASUS)" in
-            0) icon="󱜝" rpm="M" ;; # balanced
-            1) icon="󱑯" rpm="H" ;; # performance
-            2) icon="󱑰" rpm="L" ;; # silent
+            0) icon="󱜝" ;; # balanced
+            1) icon="󱑯" ;; # performance
+            2) icon="󱑰" ;; # silent
         esac
     elif [ -f "$POLICY_IBM" ]; then
         [ "$(grep 'level:' "$POLICY_IBM" | awk '{print $2}')" -eq 0 ] && icon="󱜝"
