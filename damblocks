@@ -8,6 +8,7 @@
 #    on [codeberg](https://codeberg.org/unixchad/dotfiles)
 #    and [github](https://github.com/gnuunixchad/dotfiles)
 
+set -x
 # INI
 printf "$$" > "${XDG_RUNTIME_DIR}/damblocks.pid"
 sec=0
@@ -67,8 +68,12 @@ update_battery () {
 
 update_bluetooth() {
     local icon="󰂯"
-    local level=$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')
-    [ -z "$level" ] && icon="󰂲" || level=$level%
+    if ! pgrep -x bluetoothd >/dev/null; then
+        icon="󰂲"
+    else
+        local level="$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')"
+        [ -n "$level" ] && icon="󰂱" level=$level%
+    fi
     bluetooth="${icon}${level}"
 }
 
