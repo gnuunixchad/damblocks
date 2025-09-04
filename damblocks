@@ -125,20 +125,6 @@ update_wifi() {
     wifi="${icon}${level}"
 }
 
-update_temperature() {
-    local icon=""
-    local THERMEL="/sys/class/thermal/thermal_zone0/temp"
-    local value="$(sed 's/000$//' "$THERMEL")"
-    [ -z "$value" ] && icon="󱔱" temperature=""
-    case "$value" in
-        [0-3][0-9]) icon="" ;;
-        4[0-9]) icon="" ;;
-        [5-6][0-9]) icon="" ;;
-        [7-9][0-9]) icon="" ;;
-    esac
-    temperature="${icon}${value}℃"
-}
-
 update_fanmode() {
     local icon="󰈐"
     local speed="?"
@@ -158,6 +144,20 @@ update_fanmode() {
         speed="$(grep 'speed:' "$POLICY_IBM" | awk '{print $2}')"
     fi
     fanmode="${icon}${speed}"
+}
+
+update_temperature() {
+    local icon=""
+    local THERMEL="/sys/class/thermal/thermal_zone0/temp"
+    local value="$(sed 's/000$//' "$THERMEL")"
+    [ -z "$value" ] && icon="󱔱" temperature=""
+    case "$value" in
+        [0-3][0-9]) icon="" ;;
+        4[0-9]) icon="" ;;
+        [5-6][0-9]) icon="" ;;
+        [7-9][0-9]) icon="" ;;
+    esac
+    temperature="${icon}${value}℃"
 }
 
 update_cpu() {
