@@ -55,15 +55,17 @@ update_battery () {
                 9[0-9]) icon="󰂂";;
                 100)    icon="󰁹";;
             esac
+            level="${level}%"
             ;;
         "Not charging")
-            icon=""
+            icon="" level="${level}%"
             ;;
         "Charging")
-            icon=""
+            icon="" level="${level}%"
             ;;
     esac
-    battery="${icon}${level}%"
+    ls "${POWER}/${BAT}" > /dev/null || icon=""
+    battery="${icon}${level}"
 }
 
 update_bluetooth() {
