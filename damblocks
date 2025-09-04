@@ -202,7 +202,14 @@ update_ttylogin() {
 
 update_pacman() {
     local result="$(cat $HOME/.cache/checkupdates-cron.num)"
-    local icon=""
+    local KERNELS="linux linux-lts linux-zen"
+    local kernel_running=$(uname -r | sed 's/-lts//; s/-arch/\.arch/; s/-zen//')
+    local kernel_installed=$(pacman -Q --color never $KERNELS 2> /dev/null | awk '{print $2}') # no quotes on $KERNELS
+    if [ -z "$(echo "$kernel_installed" | grep "$kernel_running")" ]; then
+        local icon=""
+    else
+        local icon="󰳛"
+    fi
     pacman="${icon}${result}"
 }
 
