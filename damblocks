@@ -130,10 +130,12 @@ update_temperature() {
     local THERMEL="/sys/class/thermal/thermal_zone0/temp"
     local value="$(sed 's/000$//' "$THERMEL")"
     [ -z "$value" ] && icon="󱔱" temperature=""
-    [ "$value" -lt 40 ] && icon=""
-    [ "$value" -lt 60 ] && icon=""
-    [ "$value" -lt 80 ] && icon=""
-    [ "$value" -ge 80 ] && icon=""
+    case "$value" in
+        [0-3][0-9]) icon="" ;;
+        4[0-9]) icon="" ;;
+        [5-6][0-9]) icon="" ;;
+        [7-9][0-9]) icon="" ;;
+    esac
     temperature="${icon}${value}℃"
 }
 
