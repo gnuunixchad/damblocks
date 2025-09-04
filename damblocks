@@ -240,13 +240,14 @@ update_mutt() {
 
 update_newsboat() {
     local NEWS_CACHE="$HOME/.cache/newsboat.num"
-    local update_newsboat_time=$(stat -c "%Y" "$NEWS_CACHE")
+    local update_time=$(stat -c "%Y" "$NEWS_CACHE")
     local current_time=$(date +%s)
     local UPDATE_FREQUENCY=14400 # 4H
-    local news_count="$(cat $NEWS_CACHE)"
-    local icon=""
-    [ $((current_time - update_newsboat_time)) -gt 86400 ] && news_count=?
-    newsboat="${icon}${news_count}"
+    local count="$(cat $NEWS_CACHE)"
+    local icon="󰍡"
+    [ "$count" -gt 0 ] && icon="󱥁"
+    [ $((current_time - update_time)) -gt 86400 ] && icon="󱙍"
+    newsboat="${icon}${count}"
 }
 
 update_calcurse() {
