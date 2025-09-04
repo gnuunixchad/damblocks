@@ -84,14 +84,16 @@ update_volume() {
     local level=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SINK@.level")
     local muted=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SINK@.muted")
     [ -z "$muted" ] && icon="" || icon=""
-    volume="${icon}${level}%"
+    [ -z "$level" ] || level="${level}%"
+    volume="${icon}${level}"
 }
 
 update_microphone() {
     local level=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SOURCE@.level")
     local muted=$(cat "${XDG_CACHE_HOME}/audio-@DEFAULT_AUDIO_SOURCE@.muted")
     [ -z "$muted" ] && icon="" || icon=""
-    microphone="${icon}${level}%"
+    [ -z "$level" ] || level="${level}%"
+    microphone="${icon}${level}"
 }
 
 update_brightness() {
@@ -110,7 +112,8 @@ update_brightness() {
         9[0-9]) icon="󱩖" ;;
         100%)     icon="󰛨"  ;;
     esac
-    brightness="${icon}${level}%"
+    [ -z "$level" ] || level="${level}%"
+    brightness="${icon}${level}"
 }
 
 update_ethernet() {
@@ -159,31 +162,36 @@ update_temperature() {
         [5-6][0-9]) icon="" ;;
         [7-9][0-9]) icon="" ;;
     esac
-    temperature="${icon}${value}℃"
+    [ -z "$value" ] || value="${value}℃"
+    temperature="${icon}${value}"
 }
 
 update_cpu() {
     local usage="$(mpstat --dec=0 | awk 'NR==4 {print 100 - $NF}')"
     local icon=""
-    cpu="${icon}${usage}%"
+    [ -z "$usage" ] || usage="${usage}%"
+    cpu="${icon}${usage}"
 }
 
 update_memory() {
     local usage="$(command free | awk '/Mem:/ {printf "%.0f\n", $3/$2 * 100}')"
     local icon=""
-    memory="${icon}${usage}%"
+    [ -z "$usage" ] || usage="${usage}%"
+    memory="${icon}${usage}"
 }
 
 update_home() {
     local usage="$(command df /home | awk 'NR==2 {print $5}' | tr -d '%')"
     local icon=""
-    home="${icon}${usage}%"
+    [ -z "$usage" ] || usage="${usage}%"
+    home="${icon}${usage}"
 }
 
 update_root() {
     local usage="$(command df / | awk 'NR==2 {print $5}' | tr -d '%')"
     local icon=""
-    root="${icon}${usage}%"
+    [ -z "$usage" ] || usage="${usage}%"
+    root="${icon}${usage}"
 }
 
 #update_usb() {
