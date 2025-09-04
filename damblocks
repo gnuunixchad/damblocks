@@ -1,14 +1,14 @@
 #!/bin/env sh
-# Pure POSIX plain text bar generator with signal support
-# Works with any bar taking stdin as plain text
 # @author nate zhou
 # @since 2025
+# Pure POSIX plain text bar generator with signal support, working with any bar
+# taking stdin as plain text.
 # Fork of sbar(https://github.com/pystardust/sbar) with custom modules.
 # Some function depends on my personal scripts for updating/caching/signaling,
-#    on [codeberg](https://codeberg.org/unixchad/dotfiles)
-#    and [github](https://github.com/gnuunixchad/dotfiles)
+# on codeberg: https://codeberg.org/unixchad/dotfiles
+# and github:  https://github.com/gnuunixchad/dotfiles
 
-set -x
+#set -x
 # INI
 printf "$$" > "${XDG_RUNTIME_DIR}/damblocks.pid"
 sec=0
@@ -68,7 +68,7 @@ update_battery () {
 
 update_bluetooth() {
     local icon="󰂯"
-    if ! pgrep -x bluetoothd >/dev/null; then
+    if ! pgrep -x 'bluetoothd' >/dev/null; then
         icon="󰂲"
     else
         local level="$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')"
@@ -141,11 +141,11 @@ update_temperature() {
 
 update_fanmode() {
     local icon="󰈐"
-    local rpm="?"
+    local speed="?"
     local POLICY_ASUS=/sys/devices/platform/asus-nb-wmi/throttle_thermal_policy
     local POLICY_IBM=/proc/acpi/ibm/fan
     if [ -f "$POLICY_ASUS" ]; then
-        rpm="$(cat /sys/module/asus_wmi/drivers/platform:asus-nb-wmi/asus-nb-wmi/hwmon/hwmon?/fan1_input)"
+        speed="$(cat /sys/module/asus_wmi/drivers/platform:asus-nb-wmi/asus-nb-wmi/hwmon/hwmon?/fan1_input)"
         case "$(cat $POLICY_ASUS)" in
             0) icon="󱜝" ;; # balanced
             1) icon="󱑯" ;; # performance
@@ -155,9 +155,9 @@ update_fanmode() {
         case "$(grep 'level:' "$POLICY_IBM" | awk '{print $2}')" in
             0|auto) icon="󱜝" ;;
         esac
-        rpm="$(grep 'speed:' "$POLICY_IBM" | awk '{print $2}')"
+        speed="$(grep 'speed:' "$POLICY_IBM" | awk '{print $2}')"
     fi
-    fanmode="${icon}${rpm}"
+    fanmode="${icon}${speed}"
 }
 
 update_cpu() {
@@ -219,10 +219,10 @@ update_pacman() {
 update_mutt() {
     local MAIL_DIR="$HOME/doc/mail"
     local MBSYNC_CACHE="${XDG_RUNTIME_DIR}/mbsync-cron"
-    local UPDATE_MUTT_FREQUENCY=1800 # in seconds
-    local update_mutt_time="$(stat -c "%Y" "$MBSYNC_CACHE")"
+    local UPDATE_FREQUENCY=1800 # in seconds
+    local update_time="$(stat -c "%Y" "$MBSYNC_CACHE")"
     local current_time="$(date +%s)"
-    local mutt_count=0
+    local count=0
     local icon="󰇮"
     # Loop through each mailbox directory
     for mailbox in "$MAIL_DIR"/*; do
@@ -231,14 +231,14 @@ update_mutt() {
             for folder in "$mailbox/INBOX" "$mailbox/Junk"; do
                 if [ -d "$folder/new" ]; then
                     # Count the number of files in the 'new' directory
-                    mutt_count=$(($mutt_count + $(find "$folder/new" -type f | wc -l)))
+                    count=$(($count + $(find "$folder/new" -type f | wc -l)))
                 fi
             done
         fi
     done
-    [ $((current_time - update_mutt_time)) -gt 86400 ] && icon="󱏣"
-    [ "$mutt_count" -gt 0 ] && icon="󰛏"
-    mutt="${icon}${mutt_count}"
+    [ $((current_time - update_time)) -gt "$UPDATE_FREQUENCY" ] && icon="󱏣"
+    [ "$count" -gt 0 ] && icon="󰛏"
+    mutt="${icon}${count}"
 }
 
 update_newsboat() {
@@ -249,27 +249,28 @@ update_newsboat() {
     local count="$(cat $NEWS_CACHE)"
     local icon="󰍡"
     [ "$count" -gt 0 ] && icon="󱥁"
-    [ $((current_time - update_time)) -gt 86400 ] && icon="󱙍"
+    [ $((current_time - update_time)) -gt "$UPDATE_FREQUENCY" ] && icon="󱙍"
     newsboat="${icon}${count}"
 }
 
 update_calcurse() {
     local DAY="28"
-    local calen_count="$(calcurse -d "$DAY" | grep '^[0-9]' | wc -l)"
+    local count="$(calcurse -d "$DAY" | grep '^[0-9]' | wc -l)"
     local icon=""
-    calcurse="${icon}${calen_count}"
+    calcurse="${icon}${count}"
 }
 
 update_wttr() {
     local WTTR_CACHE="$HOME/.cache/wttr"
-    local update_wttr_time="$(stat -c "%Y" "$WTTR_CACHE")"
+    local update_time="$(stat -c "%Y" "$WTTR_CACHE")"
     local current_time="$(date +%s)"
+    local UPDATE_FREQUENCY=14400 # 4H
     local icon=""
-    local wttr_result=""
-    [ $((current_time - update_wttr_time)) -gt 86400 ] && wttr_result=""
-    wttr_result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
-    [ ! -f "$WTTR_CACHE" ] || [ -z "$wttr_result" ] && icon="󰨹"
-    wttr="${icon}${wttr_result}"
+    local result=""
+    [ $((current_time - update_time)) -gt "$UPDATE_FREQUENCY" ] && result=""
+    result="$(sed 's/ //g; s/\+//' $WTTR_CACHE)"
+    [ ! -f "$WTTR_CACHE" ] || [ -z "$result" ] && icon="󰨹"
+    wttr="${icon}${result}"
 }
 
 # modules that don't update on their own need to be run at the start for getting their initial value
@@ -286,7 +287,7 @@ display () {
 # SIGNALLING
 # trap	"<function>;display"		"RTMIN+n"
 # to update it from external commands
-## kill -m "$(cat /tmp/damblocks)"
+## kill -m "$(cat ${XDG_RUNTIME_DIR}/damblocks.pid)"
 # where m = 34 + n
 trap	"update_bluetooth;display"	"RTMIN"     # -34 udev.rules
 trap	"update_battery;display"  	"RTMIN+1"
