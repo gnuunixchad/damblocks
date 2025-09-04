@@ -197,6 +197,7 @@ update_uptime() {
 update_ttylogin() {
     local count="$(w -h | wc -l )"
     local icon=""
+    [ "$count" -gt 1 ] && icon=""
     ttylogin="${icon}${count}"
 }
 
