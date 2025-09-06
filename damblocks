@@ -33,6 +33,17 @@ update_time () {
 	time="$icon $(date '+%b-%d %a %H:%M')"
 }
 
+update_bluetooth() {
+    local icon="󰂯"
+    if ! pgrep -x 'bluetoothd' >/dev/null; then
+        icon="󰂲"
+    else
+        local level="$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')"
+        [ -n "$level" ] && icon="󰂱" level=$level%
+    fi
+    bluetooth="${icon}${level}"
+}
+
 update_battery () {
     local icon=""
     local BAT="BAT?"
@@ -66,17 +77,6 @@ update_battery () {
     esac
     ls "${POWER}/${BAT}" > /dev/null || icon=""
     battery="${icon}${level}"
-}
-
-update_bluetooth() {
-    local icon="󰂯"
-    if ! pgrep -x 'bluetoothd' >/dev/null; then
-        icon="󰂲"
-    else
-        local level="$(bluetoothctl info | grep -m1 'Battery Percentage' | awk -F'[()]' '{print $2}')"
-        [ -n "$level" ] && icon="󰂱" level=$level%
-    fi
-    bluetooth="${icon}${level}"
 }
 
 # For audio & brightness modules, save to XDG_CACHE_HOME for reboot consistency
