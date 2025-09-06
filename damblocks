@@ -1,4 +1,4 @@
-#!/bin/env sh
+#!/usr/bin/sh
 # @author nate zhou
 # @since 2025
 # Pure POSIX plain text bar generator with signal support, working with any bar
