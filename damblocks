@@ -46,10 +46,9 @@ update_bluetooth() {
 
 update_battery () {
     local icon=""
-    local BAT="BAT?"
     local POWER="/sys/class/power_supply"
-    local status="$(cat $POWER/$BAT/status)"
-    local level="$(cat $POWER/$BAT/capacity)"
+    local status="$(cat $POWER/BAT?/status)"
+    local level="$(cat $POWER/BAT?/capacity)"
     case "$status" in
         "Discharging")
             case "$level" in
@@ -75,7 +74,7 @@ update_battery () {
             icon="" level="${level}%"
             ;;
     esac
-    ls "${POWER}/${BAT}" > /dev/null || icon=""
+    ls ${POWER}/BAT? > /dev/null || icon=""
     battery="${icon}${level}"
 }
 
