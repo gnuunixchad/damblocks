@@ -10,8 +10,8 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
 * Modules update with variable timing.
 * Signalling to update modules when needed.
 
-# Usage
-## Start in river with my build of dam
+## Usage
+Start in river with my build of dam:
 ```sh
 # https://codeberg.org/unixchad/dam
 # https://github.com/gnuunixchad/dam
@@ -19,19 +19,28 @@ riverctl spawn "${HOME}/.local/bin/dam-run"
 ```
 ([dam-run](./dam-run))
 
-## Start in my build of dwl
+Start in my build of dwl:
 ```sh
 # https://codeberg.org/unixchad/dwl
 # https://github.com/gnuunixchad/dwl
 alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
 ```
+## Dependency
 
+**depends:**    ttf-nerd-fonts-symbols wireplumber brightnessctl coreutils sed grep awk curl
 
-> [!NOTE]
-> Some functions depends on files generated my personal scripts from a cronjob,
-> which can be found inside the `.local/bin/` directory from my `dotfiles`([codeberg](https://codeberg.org/unixchad/dotfiles)/[github](https://github.com/gnuunixchad/dotfiles)).
+**suggests:**   dash bluez-utils isync newsboat calcurse mpc wob
 
-# Setup
+Every function that supports signaling depends on one or more of:
+  1. my personal scripts        (~/.local/bin/)
+  2. cronjobs                   (~/.config/crontab.example)
+  3. udev rules                 (/etc/udev/rules)
+
+Specific dependencies are listed in the SIGNALING session in this script
+
+All scrips/cronjobs/rules are available on [codeberg](https://codeberg.org/unixchad/dotfiles) and [github](https://github.com/gnuunixchad/dotfiles)
+
+## Modification
 
 * Add bar module as a function. Make sure to assign it to a variable.
 ```
@@ -41,8 +50,7 @@ update_cpu () {
 ```
 
 * Modify display function to change the positioning of output.
-```
-display () { 
+``` display () { 
 	xsetroot -name " [$weather] [$memory $cpu] [$bat] [$backlight] [$vol] $time "
 }
 ```
@@ -66,9 +74,6 @@ kill -40 "$(cat ~/.cache/pidofbar)"
 
 
 * Add the update information in the while loops as follows
-``` 
-[ $((sec % 60)) -eq 2 ] && update_cpu
+``` [ $((sec % 60)) -eq 2 ] && update_cpu
 ```
 To update item ever 60 seconds with an offset of 2 seconds.
-
-
