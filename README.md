@@ -10,6 +10,27 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
 * Modules update with variable timing.
 * Signalling to update modules when needed.
 
+## Dependency
+**depends:**    ttf-nerd-fonts-symbols wireplumber brightnessctl coreutils sed grep awk curl cronie stow systemd
+
+**suggests:**   dash bluez-utils isync newsboat calcurse mpc wob
+
+Every function that supports signaling depends on one or more of:
+  1. [scripts](./bin/)
+  2. [udev rules](etc/udev/rules.d/)
+  3. [cronjobs](./etc/crontab)
+
+Specific dependencies are listed in the SIGNALING session in this script.
+
+## Installation
+To mange all the scripts, udev rules and cronjobs:
+```sh
+# install
+make install
+# uninstall
+make uninstall
+```
+
 ## Usage
 Start in river with my build of dam:
 ```sh
@@ -25,20 +46,6 @@ Start in my build of dwl:
 # https://github.com/gnuunixchad/dwl
 alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
 ```
-## Dependency
-
-**depends:**    ttf-nerd-fonts-symbols wireplumber brightnessctl coreutils sed grep awk curl
-
-**suggests:**   dash bluez-utils isync newsboat calcurse mpc wob
-
-Every function that supports signaling depends on one or more of:
-  1. my personal scripts        (~/.local/bin/)
-  2. cronjobs                   (~/.config/crontab.example)
-  3. udev rules                 (/etc/udev/rules)
-
-Specific dependencies are listed in the SIGNALING session in this script
-
-All scrips/cronjobs/rules are available on [codeberg](https://codeberg.org/unixchad/dotfiles) and [github](https://github.com/gnuunixchad/dotfiles)
 
 ## Modification
 
