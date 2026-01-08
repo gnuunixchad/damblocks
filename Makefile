@@ -9,7 +9,7 @@ install: install_bin install_rules install_cronjobs
 
 install_bin:
 	@mkdir -p $(BIN_DEST)
-	@stow -R --adopt -d $(BIN_SOURCE) -t $(BIN_DEST) .
+	@stow -R -d $(BIN_SOURCE) -t $(BIN_DEST) .
 
 install_rules:
 	@sudo mkdir -p $(RULES_DEST)
@@ -23,7 +23,7 @@ install_cronjobs:
 uninstall: uninstall_bin uninstall_rules uninstall_cronjobs
 
 uninstall_bin:
-	@stow -D --adopt -d $(BIN_SOURCE) -t $(BIN_DEST) .
+	@stow -D -d $(BIN_SOURCE) -t $(BIN_DEST) .
 
 uninstall_rules:
 	@sudo rm $(RULES_DEST)/99-damblocks-bluetooth.rules $(RULES_DEST)/99-damblocks-usb-audio.rules
