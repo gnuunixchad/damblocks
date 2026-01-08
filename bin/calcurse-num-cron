@@ -1,0 +1,43 @@
+#!/usr/bin/sh
+# @author nate zhou
+# @since 2025
+# future event count for my status bar
+
+#set -x
+NUM="$HOME/.cache/calcurse.num"
+DAY="28" # for the given range of days to print events
+
+update_num() {
+    calcurse -d "$DAY" | grep '^[0-9]' | wc -l  > "$NUM"
+    kill -43 $(cat ${XDG_RUNTIME_DIR}/damblocks.pid);
+}
+
+if [ ! -f "$NUM" ]; then
+    update_num
+    exit 0
+fi
+
+while [ -n "$1" ]; do
+    case "$1" in
+        -n | --now)
+            echo "update now"
+            update_num
+            exit 0
+            ;;
+    esac
+    shift
+done
+
+# modified time in seconds since the Epoch
+update_time=$(stat -c "%Y" "$NUM")
+# seconds since the Epoch
+current_time=$(date +%s)
+UPDATE_FREQUENCY=3600 # 1H
+
+
+if [ $(( $current_time - $update_time)) -gt $UPDATE_FREQUENCY ]; then
+    update_num
+else
+    echo "Already updated within past $(($UPDATE_FREQUENCY/3600)) hours"
+    exit 1
+fi

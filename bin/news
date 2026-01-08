@@ -1,0 +1,14 @@
+#!/usr/bin/sh
+# @author nate zhou
+# @since 2025
+# update newsboat unread count for my status bar
+
+update() {
+    $HOME/.local/bin/newsboat-num-cron --now >/dev/null
+    kill -42 $(cat ${XDG_RUNTIME_DIR}/damblocks.pid);
+}
+
+# update count on exit, interrupted or terminated
+trap update EXIT INT TERM
+
+command newsboat -q

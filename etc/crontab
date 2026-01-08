@@ -1,0 +1,25 @@
+# vim:ft=crontab
+# @author nate zhou
+# @since 2025
+# minute hour day_of_month month day_of_week command
+# cronjobs for damblocks status update
+
+# status bar wttr
+@reboot $HOME/.local/bin/updw
+*/5 * * * * $HOME/.local/bin/updw-cron
+
+# status bar pacman updates count
+@reboot $HOME/.local/bin/checkupdates-cron --now
+*/15 * * * * $HOME/.local/bin/checkupdates-cron
+
+# automatically rss feed fetch
+@reboot $HOME/.local/bin/newsboat-update-cron
+*/15 * * * * $HOME/.local/bin/newsboat-update-cron
+
+# status bar newsboat unread count
+@reboot $HOME/.local/bin/newsboat-num-cron
+*/15 * * * * $HOME/.local/bin/newsboat-num-cron
+
+# status bar calcurse even count
+@reboot $HOME/.local/bin/calcurse-num-cron
+*/15 * * * * $HOME/.local/bin/calcurse-num-cron

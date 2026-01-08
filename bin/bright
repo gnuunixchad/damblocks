@@ -1,0 +1,82 @@
+#!/usr/bin/sh
+# bright
+# @author nate zhou
+# @since 2025,2026
+# @depends brightnessctl
+
+# This script has completions: `.config/{z,ba}sh/completions/_scripts.{z,ba}sh`
+
+#set -x
+WOBFIFO="${XDG_RUNTIME_DIR}/wob.fifo"
+# save brightness to XDG_CACHE_DIR for reboot consistency
+BRIGHTNESS="${XDG_CACHE_HOME}/brightness.level"
+DAMBLOCKS="${XDG_RUNTIME_DIR}/damblocks.pid"
+
+usage() {
+    cat <<_EOF_
+USAGE
+        $(basename $0) [OPTION]
+        Without an option, $(basename $0) reloads damblocks brightness module
+        and WOBFIFO
+OPTIONS
+        --minus     decrease brightness by 1%
+        --minus10   decrease brightness by 10%
+        --plus      increase brightness by 1%
+        --plus10    increase brightness by 10%
+        --max       set brightness to 100%
+        --min       set brightness to 0%
+        --no-fifo   reload damblocks brightness moduel without WOBFIFO
+_EOF_
+    exit 0
+}
+
+parseBrightness() {
+    grep 'Current brightness' \
+            | tr '()' ' ' | cut -d' ' -f5 | sed 's/%//' \
+            | tee "$WOBFIFO" "$BRIGHTNESS" \
+        && kill -38 "$(cat $DAMBLOCKS)";
+}
+
+# don't direct to WOBFIFO if brightness change is triggered by an idle manager.
+parseBrightnessIdle() {
+    grep 'Current brightness' \
+            | tr '()' ' ' | cut -d' ' -f5 | sed 's/%//' > "$BRIGHTNESS" \
+        && kill -38 "$(cat $DAMBLOCKS)";
+}
+
+changeBrightness() {
+    brightnessctl set "$1" | parseBrightness
+}
+
+while [ -n "$1" ]; do
+    case "$1" in
+        --minus)
+            changeBrightness '1%-'
+            ;;
+        --minus10)
+            changeBrightness '10%-'
+            ;;
+        --plus)
+            changeBrightness '1%+'
+            ;;
+        --plus10)
+            changeBrightness '10%+'
+            ;;
+        --max)
+            changeBrightness '100%'
+            ;;
+        --min)
+            changeBrightness '0%'
+            ;;
+        --no-fifo)
+            brightnessctl | parseBrightnessIdle
+            return
+            ;;
+        *)
+            usage
+            ;;
+    esac
+    shift
+done
+
+[ -z "$1" ] && brightnessctl | parseBrightness

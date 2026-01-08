@@ -1,0 +1,98 @@
+#!/usr/bin/sh
+# @author nate zhou
+# @since 2025,2026
+# @depends wireplumber
+# change volume of pipewire sinks/sources and track status.
+
+# This script has completions: `.config/{z,ba}sh/completions/_scripts.{z,ba}sh`
+
+# status is saved to XDG_CACHE_DIR for reboot consistency
+WOBFIFO="${XDG_RUNTIME_DIR}/wob.fifo"
+DAMBLOCKS="${XDG_RUNTIME_DIR}/damblocks.pid"
+
+[ "$1" = "sink" ] && target="@DEFAULT_AUDIO_SINK@"
+[ "$1" = "source" ] && target="@DEFAULT_AUDIO_SOURCE@"
+
+usage() {
+    cat <<_EOF_
+USAGE
+        $(basename $0) TARGET OPTION
+TARGETS
+        sink        pipewire's DEFAULT_AUDIO_SINK
+        source      pipewire's DEFAULT_AUDIO_SOURCE
+        all         apply OPTION on both sink and source
+OPTIONS
+        --minus     decrease TARGET's volume by 1%
+        --minus10   decrease TARGET's volume by 10%
+        --plus      increase TARGET's volume by 1%
+        --plus10    increase TARGET's volume by 10%
+        --mute      toggle TARGET's mute
+        --reload    reload damblocks' audio module for TARGET
+_EOF_
+    exit 0
+}
+
+blocks_reload() {
+    parseVolume
+    [ "$1" = "sink"  ] && kill -36 "$(cat $DAMBLOCKS)";
+    [ "$1" = "source" ] && kill -37 "$(cat $DAMBLOCKS)";
+    # ../../etc/udev/rules.d/99-damblocks-bluetooth.rules
+    [ "$1" = "all" ] \
+        && kill -36 "$(cat $DAMBLOCKS)" \
+        && kill -37 "$(cat $DAMBLOCKS)";
+}
+
+get_volume() {
+    local status=$(wpctl get-volume "$target" 2> /dev/null)
+    blocks_reload "$1"
+}
+
+set_volume() {
+    wpctl set-volume "$target" "$2" 2> /dev/null
+    get_volume "$1"
+}
+
+toggle_mute() {
+    wpctl set-mute "$target" toggle 2> /dev/null
+    local status=$(wpctl get-volume "$target" 2> /dev/null)
+    blocks_reload "$1"
+}
+
+parseVolume() {
+    echo "$status" | grep -i 'MUTED' > "${XDG_CACHE_HOME}/audio-${target}.muted"
+
+    if grep -q 'MUTED' "${XDG_CACHE_HOME}/audio-${target}.muted"; then
+        echo "$status" \
+            | sed 's/[^0-9]//g; s/^0//' \
+            > "${XDG_CACHE_HOME}/audio-${target}.level"
+        echo "0" > "$WOBFIFO"
+    else # When toggling on mute, display 0% progress in wob
+        echo "$status" \
+            | sed 's/[^0-9]//g; s/^0//' \
+            | tee "$WOBFIFO" "${XDG_CACHE_HOME}/audio-${target}.level"
+    fi
+}
+
+case "$2" in
+    --minus)
+        set_volume "$1" "1%-"
+        ;;
+    --minus10)
+        set_volume "$1" "10%-"
+        ;;
+    --plus)
+        set_volume "$1" "1%+"
+        ;;
+    --plus10)
+        set_volume "$1" "10%+"
+        ;;
+    --mute)
+        toggle_mute "$1"
+        ;;
+    --reload)
+        set_volume "$1" "0%-"
+        ;;
+    *)
+        usage
+        ;;
+esac

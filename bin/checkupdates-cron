@@ -1,0 +1,57 @@
+#!/usr/bin/sh
+# @ author nate zhou
+# @ since 2024,2025
+# check available pacman packages and write the number to a cache file
+# for my status bar
+# @depends pacman-contrib, dunst, cronie, lsupdates*
+
+LOG_CACHE="$HOME/.cache/checkupdates-cron.log"
+ERR_CACHE="$HOME/.cache/checkupdates-cron.err"
+NUM_CACHE="$HOME/.cache/checkupdates-cron.num"
+
+# modified time in seconds since the Epoch
+update_time=$(stat -c "%Y" "$LOG_CACHE")
+# seconds since the Epoch
+current_time=$(date +%s)
+UPDATE_FREQUENCY=3600 # in seconds, 1H
+
+update_cache() {
+# redirect stdout to the cache file, translate newline to space
+result="$(checkupdates --nocolor )"
+if [ -n "$result" ]; then
+    checkupdates --nocolor && echo "$result" \
+        | awk '{print $1}' \
+        | tr '\n' ' ' > "$LOG_CACHE" \
+        || echo "$result" > "$ERR_CACHE"
+else
+    # if no updates available, overwrite cache with empty string
+    echo "" > "$LOG_CACHE"
+fi
+wc -w "$LOG_CACHE" | awk '{print $1}' > "$NUM_CACHE"
+kill -40 $(cat ${XDG_RUNTIME_DIR:-"/run/user/1000"}/damblocks.pid);
+}
+
+while [ -n "$1" ]; do
+    case "$1" in
+        -n | --now)
+            echo "update now"
+            update_cache
+            exit 0
+            ;;
+    esac
+    shift
+done
+
+if [ ! -f "$LOG_CACHE" ]; then
+    touch "$LOG_CACHE"
+    update_cache
+    exit 0
+fi
+
+# check last update time
+if [ $(( current_time - update_time )) -gt $UPDATE_FREQUENCY ]; then
+    update_cache
+else
+    echo "Already updated within past $(($UPDATE_FREQUENCY/3600)) hours"
+    exit 1
+fi

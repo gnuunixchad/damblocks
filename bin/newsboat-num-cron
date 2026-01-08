@@ -1,0 +1,47 @@
+#!/usr/bin/sh
+# @author nate zhou
+# @since 2025
+# unread articles count for my status bar
+
+#set -x
+NUM="$HOME/.cache/newsboat.num"
+
+update_num() {
+    result="$(command newsboat -x print-unread)"
+    echo "$result" | grep -q '^[0-9]' \
+        && echo "$result" \
+        | cut -d' ' -f1 > "$NUM" \
+        || echo "$result"
+    #echo "$result" | cut -d' ' -f1 > "$NUM"
+    kill -42 $(cat ${XDG_RUNTIME_DIR}/damblocks.pid);
+}
+
+if [ ! -f "$NUM" ]; then
+    update_num
+    exit 0
+fi
+
+while [ -n "$1" ]; do
+    case "$1" in
+        -n | --now)
+            echo "[$(basename $0)] update now"
+            update_num
+            exit 0
+            ;;
+    esac
+    shift
+done
+
+# modified time in seconds since the Epoch
+update_time=$(stat -c "%Y" "$NUM")
+# seconds since the Epoch
+current_time=$(date +%s)
+UPDATE_FREQUENCY=14400 # 4H
+
+
+if [ $(( current_time - update_time )) -gt $UPDATE_FREQUENCY ]; then
+    update_num
+else
+    echo "Already updated within past $(($UPDATE_FREQUENCY/3600)) hours"
+    exit 1
+fi
