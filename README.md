@@ -32,7 +32,7 @@ make uninstall
 ```
 
 ## Usage
-Start in river with my build of dam:
+Start in river-classic with my build of dam:
 ```sh
 # https://codeberg.org/unixchad/dam
 # https://github.com/gnuunixchad/dam
