@@ -32,13 +32,11 @@ make uninstall
 ```
 
 ## Usage
-Start in river with my build of dam:
+Start in river with kwm:
 ```sh
-# https://codeberg.org/unixchad/dam
-# https://github.com/gnuunixchad/dam
-riverctl spawn "${HOME}/.local/bin/dam-run"
+# ~/.config/river/init:
+${HOME}/.local/bin/damblocks | /usr/local/bin/kwm
 ```
-([dam-run](./dam-run))
 
 Start in my build of dwl:
 ```sh
