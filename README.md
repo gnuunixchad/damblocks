@@ -32,16 +32,34 @@ make uninstall
 ```
 
 ## Usage
-Start in river-classic with my build of dam:
+### river with kwm
+Add below in  `~/.config/river/init`
 ```sh
+# my build of kwm
+# https://codeberg.org/unixchad/kwm
+# https://github.com/gnuunixchad/kwm
+${HOME}/.local/bin/damblocks | /usr/local/bin/kwm &
+killall -q mpc
+${HOME}/.local/bin/damblocks-mpdd
+```
+
+And run
+```sh
+exec ssh-agent river --no-xwayland
+```
+
+### river-classic with dam
+```sh
+# my build of dam
 # https://codeberg.org/unixchad/dam
 # https://github.com/gnuunixchad/dam
 riverctl spawn "${HOME}/.local/bin/dam-run"
 ```
 ([dam-run](./dam-run))
 
-Start in my build of dwl:
+### dwl with bar patch
 ```sh
+# my build of dwl
 # https://codeberg.org/unixchad/dwl
 # https://github.com/gnuunixchad/dwl
 alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
