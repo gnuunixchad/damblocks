@@ -47,8 +47,10 @@ And run
 ```sh
 exec ssh-agent river --no-xwayland
 ```
+---
 
 ### river-classic with dam
+Add below in  `~/.config/river/init`
 ```sh
 # my build of dam
 # https://codeberg.org/unixchad/dam
@@ -56,6 +58,12 @@ exec ssh-agent river --no-xwayland
 riverctl spawn "${HOME}/.local/bin/dam-run"
 ```
 ([dam-run](./dam-run))
+
+And run
+```sh
+exec ssh-agent river --no-xwayland
+```
+---
 
 ### dwl with bar patch
 ```sh
