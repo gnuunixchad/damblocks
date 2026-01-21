@@ -48,6 +48,11 @@ And run
 ```sh
 exec ssh-agent river --no-xwayland
 ```
+
+To restart the bar script
+```sh
+nohup damblocks --fifo &
+```
 ---
 
 ### river-classic with dam
