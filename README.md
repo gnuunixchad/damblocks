@@ -9,6 +9,7 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
 ## Features
 * Modules update with variable timing.
 * Signalling to update modules when needed.
+- Output to stdin(default) or a fifo(with --fifo option, at `XDG_RUNTIME_DIR/damblocks.fifo`).
 
 ## Dependency
 **depends:**    ttf-nerd-fonts-symbols wireplumber brightnessctl coreutils sed grep awk curl cronie stow systemd
@@ -38,8 +39,8 @@ Add below in  `~/.config/river/init`
 # my build of kwm
 # https://codeberg.org/unixchad/kwm
 # https://github.com/gnuunixchad/kwm
-${HOME}/.local/bin/damblocks | /usr/local/bin/kwm &
 killall -q mpc
+${HOME}/.local/bin/damblocks --fifo
 ${HOME}/.local/bin/damblocks-mpdd
 ```
 
