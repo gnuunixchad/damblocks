@@ -39,8 +39,8 @@ Add below in  `~/.config/river/init`
 # my build of kwm
 # https://codeberg.org/unixchad/kwm
 # https://github.com/gnuunixchad/kwm
+${HOME}/.local/bin/damblocks --fifo &
 killall -q mpc
-${HOME}/.local/bin/damblocks --fifo
 ${HOME}/.local/bin/damblocks-mpdd
 ```
 
