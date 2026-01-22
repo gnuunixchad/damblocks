@@ -51,7 +51,7 @@ exec ssh-agent river --no-xwayland
 
 To restart the bar script
 ```sh
-nohup damblocks --fifo &
+nohup damblocks --fifo >/dev/null 2>&1 &
 ```
 ---
 
