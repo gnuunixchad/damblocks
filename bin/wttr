@@ -1,0 +1,130 @@
+#!/usr/bin/sh
+# @author nate zhou
+# @since 2023,2024,2025,2026
+# @depends: libnotify, dunst(or equivalent daemon)
+# wttr - weather report script
+
+# This script has completions: `.config/{z,ba}sh/completions/_scripts.{z,ba}sh`
+
+CITY="${HOME}/.cache/city"
+WTTR="${HOME}/.cache/wttr"
+DAMBLOCKS="${XDG_RUNTIME_DIR}/damblocks.pid"
+
+update_frequency=3600 # in seconds
+
+usage() {
+    cat << _EOF_
+USAGE
+            $(basename $0) [CITY] [OPTION]
+            without CITY, read the local cache in $WTTR
+OPTIONS
+            -u,--update     update the local cache in $WTTR
+            -c,--cron       to be run as a cron job that checks the last update
+                            time with the defined update_frequency($update_frequency seconds)
+            -e,--edit       edit the CITY in $CITY
+            -h,--help       print this usage manual
+_EOF_
+    exit 0
+}
+
+send_signal() {
+    kill -44 "$(cat $DAMBLOCKS)"
+}
+
+update_cmd() {
+    curl wttr.in/${city}?format=1
+}
+
+notify() {
+    msg="$1"
+
+    [ "$XDG_SESSION_TYPE" != "tty" ] && notify-send -r 23 "$(basename $0)" "$msg"
+}
+
+abort() {
+    msg="$1"
+
+    RED='\033[0;31m'
+    RESET='\033[0m'
+
+    echo "${RED}${1}${RESET}"
+
+    notify "$msg" >&2
+    exit 1
+}
+
+check_cache() {
+    wttr=$(cat $WTTR 2>/dev/null)
+
+    if [ ! -f "$CITY" ]; then
+        msg="$CITY doesn't exist, try \"$(basename $0) -e\" first."
+        abort "$msg"
+    elif [ -z "$wttr" ]; then
+        update
+    fi
+}
+
+update() {
+    city="$(cat $CITY)"
+    msg=$(update_cmd)
+    if echo "$msg" | grep -q '°C'; then
+        echo "$msg" | sed 's/[[:space:]]\+/ /g' | tee "$WTTR"
+        notify "$msg"
+        exit 0
+    else
+        msg="downloading failed, please check the connection to wttr.in"
+        abort "$msg"
+    fi
+}
+
+
+get_local_wttr() {
+    check_cache
+
+    wttr=$(cat $WTTR)
+    msg="$wttr"
+    echo "$msg"
+    notify "$msg"
+
+}
+
+get_city_wttr() {
+    city="$1"
+    msg=$(update_cmd)
+    echo "$msg"
+    notify "$msg"
+}
+
+edit_city() {
+    $EDITOR $CITY
+}
+
+cron() {
+    check_cache
+
+    local current_time="$(date +%s)"
+    local update_time="$(stat -c '%Y' "$WTTR")"
+
+
+    if [ $(( $current_time - $update_time )) -gt "$update_frequency" ]; then
+        update
+    else
+        msg="Already update within past $(( $update_frequency / 3600)) hours"
+        echo $msg
+    fi
+
+}
+
+trap send_signal EXIT
+
+[ -z "$1" ] && get_local_wttr
+
+if [ -n "$1" ]; then
+    case "$1" in
+        -u|--update) update ;;
+        -c|--cron) cron "$1" ;;
+        -e|--edit) edit_city ;;
+        -h|--help) usage ;;
+        *) get_city_wttr "$1" ;;
+    esac
+fi
