@@ -26,6 +26,7 @@ Specific dependencies are listed in the SIGNALING session in this script.
 ## Installation
 To mange all the scripts, udev rules and cronjobs:
 ```sh
+# no sudo, scripts and cronjobs are installed as current user instead of root
 # install
 make install
 # uninstall
