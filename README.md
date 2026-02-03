@@ -65,7 +65,7 @@ Add below in  `~/.config/river/init`
 # https://github.com/gnuunixchad/dam
 riverctl spawn "${HOME}/.local/bin/dam-run"
 ```
-([dam-run](./dam-run))
+([dam-run](./bin/dam-run))
 
 And run
 ```sh
