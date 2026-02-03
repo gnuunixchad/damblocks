@@ -1,5 +1,6 @@
 # <img src="./misc/damblocks-repo.png" width="24"/> damblocks
-My *Simple bar* script for displaying status information in [river](https://codeberg.org/river/river) and [dwl](https://codeberg.org/dwl/dwl).
+My *Simple bar* script for status bar in window managers, I'm using damblocks in
+river(kwm), river-classic(dam), dwl(bar patch) and sway(swaybar).
 
 ![screenshot](./dam-damblocks.png)
 
