@@ -79,6 +79,16 @@ exec ssh-agent river --no-xwayland
 # https://github.com/gnuunixchad/dwl
 alias dl="exec ssh-agent ${HOME}/.local/bin/damblocks | /usr/local/bin/dwl"
 ```
+---
+
+### sway with swaybar
+```swayconfig
+bar {
+    status_command damblocks
+}
+
+exec_always "killall -q mpc; ${HOME}/.local/bin/damblocks-mpdd"
+```
 
 ## Modification
 
