@@ -68,7 +68,10 @@ riverctl spawn "${HOME}/.local/bin/dam-run"
 
 And run
 ```sh
-exec ssh-agent river --no-xwayland
+# my build of river-classic
+# https://codeberg.org/unixchad/river-classic
+# https://github.com/gnuunixchad/river-classic
+exec ssh-agent river-classic
 ```
 ---
 
