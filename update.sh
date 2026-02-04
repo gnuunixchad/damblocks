@@ -17,14 +17,14 @@ update_damblocks() {
 update_bin() {
     mkdir -p ${damblocks}/bin
     for script in $scripts; do
-        cp ${dotfiles}/.local/bin/"$(basename $script)" ${damblocks}/bin/
+        cp ${dotfiles}/.local/bin/${script} ${damblocks}/bin/
     done
 }
 
 update_rules() {
     mkdir -p ${damblocks}/etc/udev/rules.d
     for rules in $rules; do
-        cp ${dotfiles}/etc/udev/rules.d/"$(basename $rules)" \
+        cp ${dotfiles}/etc/udev/rules.d/$rules \
               ${damblocks}/etc/udev/rules.d/
     done
 }
