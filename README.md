@@ -1,7 +1,5 @@
 # <img src="./misc/damblocks-repo.png" width="24"/> damblocks
-plain text status line generator written in POSIX shell
-
-Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
+Plain text status line generator written in POSIX shell, fork of [sbar](https://github.com/pystardust/sbar).
 
 ![screenshot](./dam-damblocks.png)
 
