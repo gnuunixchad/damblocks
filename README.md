@@ -9,6 +9,7 @@ Fork of [sbar](https://github.com/pystardust/sbar). Written in POSIX SHELL.
 - with individual update intervals and signal support
 - supporting stdin, fifo and xsetroot
 - Each module is only updated when needed, instantly
+- Restart damblocks with [reload](./bin/reload)
 
 ### Modules
 - time and date
