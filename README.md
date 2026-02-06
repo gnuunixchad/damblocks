@@ -4,10 +4,11 @@ Plain text status line generator written in POSIX shell, fork of [sbar](https://
 ![screenshot](./dam-damblocks.png)
 
 ### Features
-- with individual update intervals and signal support
-- supporting stdin, fifo and xsetroot
-- Each module is only updated when needed, instantly
+- individual update intervals and signals
+- supporting to stdin, fifo and xsetroot
+- individual modules only updated when needed, instantly
 - Restart damblocks with [reload](./bin/reload)
+- 
 
 ### Modules
 - time and date
