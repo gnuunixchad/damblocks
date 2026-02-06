@@ -25,7 +25,7 @@ Plain text status line generator written in POSIX shell, fork of [sbar](https://
 | | |
 |:---|:---|
 | depends | ttf-nerd-fonts-symbols wireplumber brightnessctl coreutils sed grep awk curl cronie udev |
-| suggests | dash bluez-utils isync newsboat calcurse mpc wob stow |
+| suggests | dash bluez-utils isync newsboat calcurse mpc wob xob stow |
 
 Every function that supports signaling depends on one or more of:
   1. [scripts](./bin/)
