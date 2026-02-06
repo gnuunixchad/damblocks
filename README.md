@@ -5,10 +5,10 @@ Plain text status line generator written in POSIX shell, fork of [sbar](https://
 
 ### Features
 - individual update intervals and signals
-- supporting to stdin, fifo and xsetroot
 - individual modules only updated when needed, instantly
+- supporting to stdin, fifo and xsetroot
+- supporting Wayland, Xorg and tty
 - Restart damblocks with [reload](./bin/reload)
-- 
 
 ### Modules
 - time and date
