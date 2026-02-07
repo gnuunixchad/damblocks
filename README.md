@@ -6,9 +6,9 @@ Plain text status line generator written in POSIX shell, fork of [sbar](https://
 ### Features
 - individual update intervals and signals
 - individual modules only updated when needed, instantly
-- supporting to stdin, fifo and xsetroot
-- supporting Wayland, Xorg and tty
-- Restart damblocks with [reload](./bin/reload)
+- supporting stdin, fifo and xsetroot
+- supporting Wayland, Xorg and TTY
+- restart damblocks with [reload](./bin/reload)
 
 ### Modules
 - time and date
@@ -50,15 +50,17 @@ make uninstall
 - `--fifo` redirects to `${XDG_RUNTIME_DIR}/damblocks.fifo`
 - `--xsetroot` sets the X root window title
 ### river-classic with dam
-```sh
-# river-classic/init
-# see bin/dam-run
-riverctl spawn dam-run
-```
+Use [dam-run](./bin/dam-run).
 
-### river with kwm
+### kwm on river
+[kwm](./https://github.com/kewuaa/kwm) can read from stdin:
 ```sh
-# river/init
+damblocks | kwm &
+killall -q mpc
+damblocks-mpdd
+```
+or a named pipe:
+```sh
 damblocks --fifo &
 killall -q mpc
 damblocks-mpdd
@@ -76,11 +78,18 @@ exec dwm
 damblocks | dwl
 ```
 
-### sway with swaybar
+### i3/sway bar
 ```sh
+# .config/{i3,sway}/config
 bar {
     status_command damblocks
 }
 
 exec_always "killall -q mpc; damblocks-mpdd"
+```
+
+### dvtm
+```sh
+damblocks --fifo &
+dvtm -s ${XDG_RUNTIME_DIR}/damblocks.fifo
 ```
