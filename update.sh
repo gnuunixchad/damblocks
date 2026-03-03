@@ -7,7 +7,11 @@ dotfiles="${HOME}/doc/unixchad/dotfiles"
 damblocks="${HOME}/doc/unixchad/damblocks"
 
 scripts="audio bright calcurse-num-cron checkupdates-cron dam-run damblocks-mpdd mbs mbs-cron mutt news newsboat-num-cron newsboat-update-cron wobd xobd wttr reload"
-rules="99-damblocks-bluetooth.rules 99-damblocks-usb-audio.rules"
+rules="\
+    99-damblocks-bluetooth.rules \
+    99-damblocks-usb-audio.rules \
+    99-damblocks-battery.rules\
+"
 shells="bash zsh"
 
 update_damblocks() {
