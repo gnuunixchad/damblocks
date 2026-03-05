@@ -1,5 +1,5 @@
 BIN_SOURCE = bin
-BIN_DEST = ~/.local/bin
+BIN_DEST = /usr/local/bin
 RULES_SOURCE = etc/udev/rules.d
 RULES_DEST = /etc/udev/rules.d
 CRONTAB_BACKUP = ~/.config/crontab.damblocks.backup
@@ -10,8 +10,8 @@ COMP_DEST = /usr/local/share
 install: install_bin install_rules install_cronjobs install_completions
 
 install_bin:
-	@mkdir -p $(BIN_DEST)
-	@stow -R -d $(BIN_SOURCE) -t $(BIN_DEST) .
+	@sudo mkdir -p $(BIN_DEST)
+	@sudo cp $(BIN_SOURCE)/* $(BIN_DEST)
 
 install_rules:
 	@sudo mkdir -p $(RULES_DEST)
@@ -31,7 +31,9 @@ install_completions:
 uninstall: uninstall_bin uninstall_rules uninstall_cronjobs uninstall_completions
 
 uninstall_bin:
-	@stow -D -d $(BIN_SOURCE) -t $(BIN_DEST) .
+	@for file in $(BIN_SOURCE)/*; do \
+		sudo rm -f $(BIN_DEST)/$$(basename $$file); \
+	done
 
 uninstall_rules:
 	@sudo rm $(RULES_DEST)/99-damblocks-bluetooth.rules $(RULES_DEST)/99-damblocks-usb-audio.rules
