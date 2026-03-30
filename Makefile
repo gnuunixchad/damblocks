@@ -42,7 +42,7 @@ uninstall_cronjobs:
 	@crontab $(CRONTAB_BACKUP)
 
 uninstall_completions:
-	@sudo rm $(COMP_DEST)/bash-completion/completion/_damblocks.bash $(COMP_DEST)/zsh/site-functions/_damblocks.zsh
+	@sudo rm $(COMP_DEST)/bash-completion/completions/_damblocks.bash $(COMP_DEST)/zsh/site-functions/_damblocks.zsh
 
 
 .PHONY: install install_bin install_rules install_cronjobs install_completions uninstall uninstall_bin uninstall_rules uninstall_cronjobs uninstall_completions
