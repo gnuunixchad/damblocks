@@ -67,10 +67,11 @@ check_cache() {
 
 update() {
     city="$(cat $CITY)"
+    local silent="${1:-false}"
     msg=$(update_cmd)
     if echo "$msg" | grep -q '°C'; then
         echo "$msg" | sed 's/[[:space:]]\+/ /g; s/°C/℃/' | tee "$WTTR"
-        notify "$msg"
+        [ "$silent" != "true" ] && notify "$msg"
         exit 0
     else
         msg="downloading failed, please check the connection to wttr.in"
@@ -112,7 +113,7 @@ cron() {
 
 
     if [ $(( $current_time - $update_time )) -gt "$update_frequency" ]; then
-        update
+        update "true"  # silent=true
     else
         msg="Already update within past $(( $update_frequency / 3600)) hours"
         echo $msg
